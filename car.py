@@ -12,7 +12,9 @@ class AbstractCar:
         self.rotation_vel = rotation_vel
         self.angle = 0
         self.x, self.y = self.START_POS
+        self.x_prev, self.y_prev = self.START_POS
         self.acceleration = 0.15
+        self.on_finish = False
         
     def rotate(self, left=False, right=False):
         if left:
@@ -35,7 +37,7 @@ class AbstractCar:
         radians = math.radians(self.angle)
         verticle = math.cos(radians) * self.vel
         horizontal = math.sin(radians) * self.vel
-        
+        self.x_prev, self.y_prev = self.x, self.y
         self.y -= verticle
         self.x -= horizontal
         
@@ -45,9 +47,20 @@ class AbstractCar:
         car_mask = pg.mask.from_surface(rotated)
         offset = (int(rect.x - x), int(rect.y - y))
         return mask.overlap(car_mask, offset)
+    
+    def update(self, steer, throttle):   # steer in [-1, 1], throttle in [-1, 1]
+        self.angle -= steer * self.rotation_vel
+        if throttle > 0:   
+            self.vel = min(self.vel + throttle * self.acceleration, self.max_vel)
+        elif throttle < 0: 
+            self.vel = max(self.vel + throttle * self.acceleration, -self.max_vel / 2)
+        else:              
+            self.vel = max(self.vel - self.acceleration / 2, 0)  
+        self.move()
         
-    def get_sensor_data():
-        print('snse')
+    def get_sensor_data(self):
+        data = {'speed':self.vel, 'acceleration':self.acceleration, 'angle':self.angle}
+        
         
         
 class PlayerCar(AbstractCar):
