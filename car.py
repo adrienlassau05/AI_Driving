@@ -15,6 +15,7 @@ class AbstractCar:
         self.x_prev, self.y_prev = self.START_POS
         self.acceleration = 0.15
         self.on_finish = False
+        self.check_finish = True
         
     def rotate(self, left=False, right=False):
         if left:
@@ -43,7 +44,7 @@ class AbstractCar:
         
     def collide(self, mask, x=0, y=0):
         rotated = pg.transform.rotate(self.img, self.angle)
-        rect = rotated.get_rect(center=self.img.get_rect(topleft=(self.x, self.y)).center)
+        rect = rotated.get_rect(center=(self.x, self.y))
         car_mask = pg.mask.from_surface(rotated)
         offset = (int(rect.x - x), int(rect.y - y))
         return mask.overlap(car_mask, offset)
