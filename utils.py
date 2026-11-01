@@ -9,4 +9,3 @@ def blit_rotate_center(win, image, center, angle):
     rotated_image = pg.transform.rotate(image, angle)
     rect = rotated_image.get_rect(center=center)
     win.blit(rotated_image, rect)
-    
