@@ -2,7 +2,7 @@ import math
 from config import MAX_SENSOR_RANGE, NUMBER_OF_SENSORS, SENSOR_ANGLES
 
 
-def sensor(car, offset, mask, track):
+def sensor(car, mask, track, offset=0):
     WIDTH, HEIGHT = track.get_width(), track.get_height()
 
     radians = math.radians(car.angle)
@@ -30,6 +30,6 @@ def sensor(car, offset, mask, track):
 def observation_vector(car, mask, track):        
     vector = [car.vel / car.max_vel]
     for i in range(NUMBER_OF_SENSORS):
-        distance = sensor(car, SENSOR_ANGLES[i], mask, track)
+        distance = sensor(car, mask, track, SENSOR_ANGLES[i])
         vector.append(distance / MAX_SENSOR_RANGE)
     return vector

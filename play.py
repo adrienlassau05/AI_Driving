@@ -1,9 +1,10 @@
 import pygame as pg
 from config import FPS
 from env import Env
+from track import WIDTH, HEIGHT
 
 
-def move_player(car):
+def move_player():
     keys = pg.key.get_pressed()
     steer, throttle = 0, 0
     if keys[pg.K_a]:
@@ -14,12 +15,12 @@ def move_player(car):
         throttle = 1
     if keys[pg.K_s]:
         throttle = -1
-    car.update(steer, throttle)
+    return (steer, throttle)
 
 running = True
 clock = pg.time.Clock()
-env = Env(render=True, bounce=True)
-
+env = Env(render=True, bounce=True, show_gates=True)
+print(WIDTH, HEIGHT)
 while running:
     clock.tick(FPS)
     env.draw()
@@ -29,8 +30,6 @@ while running:
             running = False
             break
 
-    move_player(env.car)
-    env.collision()
-    env.check_finish()
-
+    action = move_player()
+    env.step(action)
 pg.quit()

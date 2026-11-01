@@ -14,3 +14,5 @@ WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 
 START_POSITION = (100, 300)
 START_ANGLE = 0
+
+CHECKPOINTS = [((70, 250), (200, 250)),((70, 170), (200, 170)), ((139, 50), (230, 132)), ((333, 28), (331, 121))]
