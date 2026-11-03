@@ -1,5 +1,5 @@
 import pygame as pg
-from config import FPS
+from config import FPS, LAP_NUMBER
 from env import Env
 from track import WIDTH, HEIGHT
 
@@ -24,12 +24,13 @@ print(WIDTH, HEIGHT)
 while running:
     clock.tick(FPS)
     env.draw()
-
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
             break
-
+    if env.done == True and env.turns != LAP_NUMBER+1:
+        env.done = False
     action = move_player()
     env.step(action)
+    
 pg.quit()

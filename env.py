@@ -3,7 +3,7 @@ from car import AbstractCar
 from track import (TRACK, TRACK_BORDER, TRACK_BORDER_MASK, FINISH, FINISH_MASK,
                    FINISH_POSITION, FINISH_SIGN, WIDTH, HEIGHT, CHECKPOINTS)
 from config import MAX_TRAINING_STEPS, CRASH_PENALTY, LAP_REWARD, CHECKPOINT_REWARD, LAP_NUMBER
-
+from utils import crossed
 
 class Env:
     def __init__(self, render=False, bounce=False, show_gates=False):
@@ -23,7 +23,7 @@ class Env:
         self.done = False
         self.steps = 0
         self.reward = 0
-        self.checkpoint = 15
+        self.checkpoint = 0
 
     def collision(self):
         if self.car.collide(TRACK_BORDER_MASK) is not None:
@@ -40,6 +40,7 @@ class Env:
             if dy < 0:
                 self.turns += 1
                 self.crossing = False
+                print(self.turns)
             elif dy > 0:
                 self.turns -= 1
                 self.crossing = False
@@ -63,36 +64,43 @@ class Env:
         
         pg.display.update()
         
-    def check_checkpoint(self):
+
+    def checkpoint_progress(self):
+        if self.done:
+            return
+        if self.checkpoint == 32:
+            self.checkpoint = 0
         dx = self.car.x - self.car.x_prev
         dy = self.car.y - self.car.y_prev
-        checkpoint_list = [i for i, v in enumerate(CHECKPOINTS) if v[3] - 1 == self.checkpoint]
-        needed_speed = CHECKPOINTS[checkpoint_list[0]][2]
-        checkpoint_position = (CHECKPOINTS[checkpoint_list[0]][0], CHECKPOINTS[checkpoint_list[0]][1])
-        if needed_speed[0] == 0 and needed_speed[1] * dy > 0:
-            if self.car.y < checkpoint_position[0][1] and needed_speed[1] < 0:
-                self.checkpoint += 1
-            elif self.car.y > checkpoint_position[0][1] and needed_speed[1] > 0:
-                self.checkpoint += 1
-                print('it worked')
-        elif needed_speed[1] == 0 and needed_speed[0] * dx > 0:
-            if self.car.x == 12002:
-                print('wow')
+        if dx == 0 and dy == 0:
+            return
+        a, b, needed_speed, _ = CHECKPOINTS[self.checkpoint]
+        
+        forward = needed_speed[0] * dx + needed_speed[1] * dy > 0
+        if forward and crossed((self.car.x_prev, self.car.y_prev), (self.car.x, self.car.y), a, b):
+            self.checkpoint += 1
+            print(self.checkpoint)
+                
+        
 
     def step(self, action):
         steer, throttle = action
         self.car.update(steer, throttle)
         self.collision()
         self.check_finish()
-        self.check_checkpoint()
+        self.checkpoint_progress()
+        
         if self.steps >= MAX_TRAINING_STEPS:
             self.done = True
-        
+            return
         
         if self.done == True and self.turns != LAP_NUMBER+1:
             self.reward += CRASH_PENALTY
+            return
+        
         elif self.turns == LAP_NUMBER+1:
             self.reward += LAP_REWARD 
+            
         self.steps += 1
         
 
