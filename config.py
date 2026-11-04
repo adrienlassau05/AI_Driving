@@ -11,7 +11,15 @@ FPS = 60
 MAX_TRAINING_STEPS = 7200
 LAP_NUMBER = 2
 
+#Training settings
+RUN_TIME = 2         #measured in hours
+POPULATION_SIZE = 20
+
 #Reward functions
 CRASH_PENALTY = -100
 CHECKPOINT_REWARD = 10
 LAP_REWARD = 50
+
+#Neural Network
+HIDDEN_LAYERS = 1
+NODES_LAYER1 = 6

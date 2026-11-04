@@ -92,17 +92,15 @@ class Env:
         
         if self.steps >= MAX_TRAINING_STEPS:
             self.done = True
-            return
+            return 0
         
         if self.done == True and self.turns != LAP_NUMBER+1:
             self.reward += CRASH_PENALTY
-            return
-        
+   
         elif self.turns == LAP_NUMBER+1:
             self.reward += LAP_REWARD 
-            
         self.steps += 1
-        
+        return self.reward
 
 
         
