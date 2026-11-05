@@ -2,7 +2,7 @@ import pygame as pg
 from car import AbstractCar
 from track import (TRACK, TRACK_BORDER, TRACK_BORDER_MASK, FINISH, FINISH_MASK,
                    FINISH_POSITION, FINISH_SIGN, WIDTH, HEIGHT, CHECKPOINTS)
-from config import MAX_TRAINING_STEPS, CRASH_PENALTY, LAP_REWARD, CHECKPOINT_REWARD, LAP_NUMBER
+from config import MAX_TRAINING_STEPS, CRASH_PENALTY, LAP_REWARD, CHECKPOINT_REWARD, LAP_NUMBER, TIME_PENALTY
 from utils import crossed
 
 class Env:
@@ -79,7 +79,7 @@ class Env:
         forward = needed_speed[0] * dx + needed_speed[1] * dy > 0
         if forward and crossed((self.car.x_prev, self.car.y_prev), (self.car.x, self.car.y), a, b):
             self.checkpoint += 1
-            print(self.checkpoint)
+            self.reward += CHECKPOINT_REWARD
                 
         
 
@@ -99,7 +99,9 @@ class Env:
    
         elif self.turns == LAP_NUMBER+1:
             self.reward += LAP_REWARD 
+            
         self.steps += 1
+        self.reward += TIME_PENALTY
         return self.reward
 
 

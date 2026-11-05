@@ -24,8 +24,9 @@ class NeuralNetwork:
         return self.a2       
     
     def train(self):
+        self.env.reset()
         reward = 0
-        while not self.env.car.done:
+        while not self.env.done:
             observations = observation_vector(self.env.car, TRACK_BORDER_MASK, TRACK_BORDER)
             outputs = self.forward(observations)
             action = outputs.tolist()
