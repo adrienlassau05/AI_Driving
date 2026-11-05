@@ -19,11 +19,13 @@ class Env:
     def reset(self):
         self.car = AbstractCar()
         self.turns = 0
-        self.crossing = True    
+        self.crossing = True   
+        self.finish = False 
         self.done = False
         self.steps = 0
         self.reward = 0
         self.checkpoint = 0
+        self.total_checkpoint = 0
 
     def collision(self):
         if self.car.collide(TRACK_BORDER_MASK) is not None:
@@ -40,14 +42,14 @@ class Env:
             if dy < 0:
                 self.turns += 1
                 self.crossing = False
-            elif dy > 0:
+            elif dy >= 0:
                 self.turns -= 1
                 self.crossing = False
         elif not finish_collide:
             self.crossing = True
 
         if self.turns == LAP_NUMBER+1:
-            self.done = True
+            self.finish = True
 
     def draw(self):
         if not self.render:
@@ -78,6 +80,7 @@ class Env:
         forward = needed_speed[0] * dx + needed_speed[1] * dy > 0
         if forward and crossed((self.car.x_prev, self.car.y_prev), (self.car.x, self.car.y), a, b):
             self.checkpoint += 1
+            self.total_checkpoint += 1
             self.reward += CHECKPOINT_REWARD
                 
         
@@ -91,13 +94,14 @@ class Env:
         
         if self.steps >= MAX_TRAINING_STEPS:
             self.done = True
-            return 0
+            return self.reward
         
-        if self.done == True and self.turns != LAP_NUMBER+1:
+        if self.done and not self.finish:
             self.reward += CRASH_PENALTY
    
-        elif self.turns == LAP_NUMBER+1:
+        elif self.finish:
             self.reward += LAP_REWARD 
+            self.done = True
             
         self.steps += 1
         self.reward += TIME_PENALTY

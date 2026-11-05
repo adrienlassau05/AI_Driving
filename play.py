@@ -19,7 +19,7 @@ def move_player():
 
 running = True
 clock = pg.time.Clock()
-env = Env(render=True, bounce=True, show_gates=True)
+env = Env(render=True, bounce=False, show_gates=True)
 print(WIDTH, HEIGHT)
 while running:
     clock.tick(FPS)
@@ -30,7 +30,11 @@ while running:
             break
     if env.done == True and env.turns != LAP_NUMBER+1:
         env.done = False
-    action = move_player()
+    
+    action = (0, 1)
     env.step(action)
     
+    if env.done:
+        print(f'Test Finished, Total Checkpoints: {env.total_checkpoint}')
+        running = False
 pg.quit()
