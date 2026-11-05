@@ -42,9 +42,5 @@ class NeuralNetwork:
         self.b1 = data['b1']
         self.w2 = data['W2']
         self.b2 = data['b2']
-        
-            
-        
-        
-    
+
         

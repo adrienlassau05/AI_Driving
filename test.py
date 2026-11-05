@@ -3,7 +3,8 @@ from config import RUN_TIME, POPULATION_SIZE
 from env import Env
 from brain import NeuralNetwork
 import numpy as np
-import random, copy
+import matplotlib.pyplot as plt
+import copy
 
 
 running = True
@@ -13,7 +14,7 @@ end_time = datetime.now() + timedelta(hours=RUN_TIME)
 env = Env(render=False, bounce=False, show_gates=False)
 
 population_runs, best_reward = 0, 0
-networks = []
+networks, population_statistics = [], []
 for network in range(POPULATION_SIZE):
     networks.append(NeuralNetwork(8, 6, 2))
     
@@ -31,20 +32,36 @@ def repopulate_network(results, keep):
             new_population.append(mutate_matrix(child))
     return new_population
     
-while datetime.now() < end_time:                           
+    
+def population_statistics(population):
+    rewards = []
+    population_average = 0
+    for i in range(len(population)):
+        rewards.append(population[i][0])
+        population_average += population[i][0]
+    population_average = population_average / len(population)
+    return rewards[0], population_average, rewards[-1]
+    
+        
+while datetime.now() < end_time:
     results = []
     for network in networks: 
         results.append((network.train(), network))
     results.sort(key=lambda x: x[0], reverse=True) 
-    if results[0][0] > best_reward: 
+    population_best, population_average, population_worst = population_statistics(results)
+    population_statistics.append((population_best, population_average, population_worst))
+    if population_best > best_reward: 
         results[0][1].save('current_best_network')
-        best_reward = results[0][0]
-    
-    
+        best_reward = population_best
     networks = repopulate_network(results)
+
+
     
-    
-    
-        
+x = np.arange(1, len(population_statistics), 1)
+plt.plot(x, population_statistics[0])
+plt.plot(x, population_statistics[1])
+plt.plot(x, population_statistics[2])
+plt.legend()
+plt.show()        
     
     
