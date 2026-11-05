@@ -40,7 +40,6 @@ class Env:
             if dy < 0:
                 self.turns += 1
                 self.crossing = False
-                print(self.turns)
             elif dy > 0:
                 self.turns -= 1
                 self.crossing = False

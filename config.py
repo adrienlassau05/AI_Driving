@@ -12,8 +12,10 @@ MAX_TRAINING_STEPS = 7200
 LAP_NUMBER = 2
 
 #Training settings
-RUN_TIME = 2         #measured in hours
+RUN_TIME_HOURS = 0
+RUN_TIME_MINUTES = 6
 POPULATION_SIZE = 20
+NETWORK_VISUALISE = True
 
 #Reward functions
 CRASH_PENALTY = -100

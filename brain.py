@@ -1,11 +1,14 @@
 import numpy as np
+import pygame as pg
 from env import Env
 from sensors import observation_vector
 from track import TRACK_BORDER, TRACK_BORDER_MASK
+from config import FPS
+
 
 class NeuralNetwork:
     
-    def __init__(self, input_size, hidden_size, output_size):
+    def __init__(self, input_size, hidden_size, output_size, render=False):
         self.w1 = np.random.rand(input_size, hidden_size)
         self.b1 = np.zeros((1, hidden_size))
         
@@ -13,13 +16,14 @@ class NeuralNetwork:
         self.b2 = np.zeros((1, output_size))
         
         self.tested_populaton = 0
-        self.env = Env()
+        self.env = Env(render=render, bounce=False, show_gates=True)
+        
     
     def forward(self, X):
-        self.z1 = self.w1 @ X + self.b1 
+        self.z1 = X @ self.w1 + self.b1 
         self.a1 = np.maximum(0, self.z1)
     
-        self.z2 = self.w2 @ self.a1 + self.b2
+        self.z2 = self.a1 @ self.w2 + self.b2
         self.a2 = np.tanh(self.z2)
         return self.a2       
     
@@ -29,7 +33,7 @@ class NeuralNetwork:
         while not self.env.done:
             observations = observation_vector(self.env.car, TRACK_BORDER_MASK, TRACK_BORDER)
             outputs = self.forward(observations)
-            action = outputs.tolist()
+            action = outputs[0]
             reward += self.env.step(action)
         return reward
         
@@ -43,4 +47,28 @@ class NeuralNetwork:
         self.w2 = data['W2']
         self.b2 = data['b2']
 
-        
+    def clone(self):
+        child = NeuralNetwork(8, 6, 2)
+        child.w1 = self.w1.copy()
+        child.b1 = self.b1.copy()
+        child.w2 = self.w2.copy()
+        child.b2 = self.b2.copy()
+        return child
+    
+    def visualise(self):
+        self.env = Env(render=True, bounce=False, show_gates=True)
+        self.env.reset()
+        clock = pg.time.Clock()
+        while not self.env.done:
+            clock.tick(FPS)
+            
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    return
+            
+            observations = observation_vector(self.env.car, TRACK_BORDER_MASK, TRACK_BORDER)
+            outputs = self.forward(observations)
+            self.env.step(outputs.tolist())
+            self.env.draw()
+            
+        pg.quit()
