@@ -2,14 +2,14 @@ import numpy as np
 import pygame as pg
 from env import Env
 from sensors import observation_vector
-from track import TRACK_BORDER, TRACK_BORDER_MASK
+from track import TRACK_BORDER_MASK
 from config import FPS, NODES_LAYER1
 
 
 class NeuralNetwork:
     
     def __init__(self, input_size, hidden_size, output_size, render=False):
-        self.w1 = 2*np.random.uniform(-1, 1, (input_size, hidden_size))
+        self.w1 = np.random.randn(input_size, hidden_size) * 0.5
         self.b1 = np.zeros((1, hidden_size))
         
         self.w2 = 2*np.random.uniform(-1, 1, (hidden_size, output_size))
@@ -17,6 +17,7 @@ class NeuralNetwork:
         
         self.tested_populaton = 0
         self.env = Env(render=render, bounce=False, show_gates=True)
+        self.score = None
         
     
     def forward(self, X):        
@@ -28,14 +29,15 @@ class NeuralNetwork:
         
         return self.a2       
     
-    def train(self):
-        self.env.reset()
+    def run(self, env):
+        if self.score is not None:
+            return self.score
+        env.reset()
         reward = 0
-        while not self.env.done:
-            observations = observation_vector(self.env.car, TRACK_BORDER_MASK, TRACK_BORDER)
-            outputs = self.forward(observations)
-            action = outputs[0]
-            reward = self.env.step(action)
+        while not env.done:
+            observations = observation_vector(env.car, TRACK_BORDER_MASK)
+            reward = env.step(self.forward(observations)[0])
+            self.score = reward
         return reward
         
     def save(self, filename):
@@ -67,9 +69,9 @@ class NeuralNetwork:
                 if event.type == pg.QUIT:
                     return
             
-            observations = observation_vector(self.env.car, TRACK_BORDER_MASK, TRACK_BORDER)
+            observations = observation_vector(self.env.car, TRACK_BORDER_MASK)
             outputs = self.forward(observations)
             self.env.step(outputs[0])
             self.env.draw()
-            
-        pg.quit()
+
+        

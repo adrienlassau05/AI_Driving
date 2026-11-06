@@ -28,10 +28,8 @@ while running:
         if event.type == pg.QUIT:
             running = False
             break
-    if env.done == True and env.turns != LAP_NUMBER+1:
-        env.done = False
-    
-    action = (0, 1)
+        
+    action = move_player()
     env.step(action)
     
     if env.done:

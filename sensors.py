@@ -2,34 +2,26 @@ import math
 from config import MAX_SENSOR_RANGE, NUMBER_OF_SENSORS, SENSOR_ANGLES
 
 
-def sensor(car, mask, track, offset=0):
-    WIDTH, HEIGHT = track.get_width(), track.get_height()
-
-    radians = math.radians(car.angle)
-    offset_rads = math.radians(offset)
-    dx = math.sin(radians + offset_rads)
-    dy = math.cos(radians + offset_rads)
-    position = [car.x, car.y]
-    distance = 0
-
-    while not mask.get_at((int(position[0]), int(position[1]))):
-        if position[0] - dx >= WIDTH or position[0] - dx < 0:
+def sensor(car, mask, offset=0, step=2):
+    WIDTH, HEIGHT = mask.get_size()
+    radians = math.radians(car.angle + offset)
+    dx, dy = math.sin(radians), math.cos(radians)
+    x, y = car.x, car.y
+    dist = 0
+    while dist < MAX_SENSOR_RANGE:
+        nx, ny = x-dx, y-dy
+        if not (0 <= nx < WIDTH and 0 <= ny < HEIGHT):
             break
-        elif position[1] - dy >= HEIGHT or position[1] - dy < 0:
+        x, y = nx, ny
+        dist += step
+        if mask.get_at((int(x), int(y))):
             break
-        else:
-            position[0] -= dx
-            position[1] -= dy
-        x_distance = position[0] - car.x
-        y_distance = position[1] - car.y
-        distance = math.sqrt(x_distance**2 + y_distance**2)
-        if distance >= MAX_SENSOR_RANGE:
-            break
-    return distance
+    return dist
 
-def observation_vector(car, mask, track):        
+
+def observation_vector(car, mask):        
     vector = [car.vel / car.max_vel]
     for i in range(NUMBER_OF_SENSORS):
-        distance = sensor(car, mask, track, SENSOR_ANGLES[i])
+        distance = sensor(car, mask, SENSOR_ANGLES[i])
         vector.append(distance / MAX_SENSOR_RANGE)
     return vector
