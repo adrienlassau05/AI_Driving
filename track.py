@@ -12,7 +12,7 @@ FINISH_POSITION = (75, 250)
 
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 
-START_POSITION = (100, 300)
+START_POSITION = (130, 300)
 START_ANGLE = 0
 
 #CHECKPOINTS = ((x1, y1),                    (x2, y2),                 (dx, dy),             N)

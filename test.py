@@ -94,6 +94,7 @@ while datetime.now() < end_time:
         best_overall[0] = population_best
         best_overall[1] = results[0][1].clone()
         best_overall[2] = population_runs
+        
         if NETWORK_VISUALISE_BEST:
             print(f'Best reward: {best_overall[0]}')
             best_overall[1].visualise()
@@ -104,8 +105,8 @@ while datetime.now() < end_time:
                 best_overall[1].visualise()
                 
     stale = population_runs - best_overall[2] >= 10
-        
-    networks = repopulate_network(results, 4, stale)
+    num_kept = round(POPULATION_SIZE * 0.2)  
+    networks = repopulate_network(results, num_kept, stale)
     if stale == True:
         best_overall[2] = population_runs
 

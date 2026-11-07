@@ -84,7 +84,7 @@ class Env:
             self.checkpoint = (self.checkpoint + 1) % len(CHECKPOINTS)
             self.total_checkpoint += 1
             self.prev_dist = None
-            self.reward += CHECKPOINT_REWARD
+            self.reward += CHECKPOINT_REWARD 
         
         a, b, _, _ = CHECKPOINTS[self.checkpoint]
         mid = ((a[0]+b[0])/2, (a[1]+b[1])/2)
@@ -125,8 +125,8 @@ class Env:
             self.reward += LAP_REWARD 
             self.done = True
             
+        self.reward -= TIME_PENALTY    
         self.steps += 1
-        self.reward += TIME_PENALTY
         return self.reward
 
 
